@@ -400,16 +400,23 @@ nav.scrolled {
 }
 
 .person-placeholder img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    align-self: flex-end;
-    transform: scale(var(--img-scale, 1));
-    transform-origin: bottom center;
-    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 80%;
+    border-radius: 25px;
+
+    -webkit-mask-image:
+        linear-gradient(to right,
+            transparent 0%,
+            #272727 40%,
+            black 85%,
+            transparent 500%),
+        linear-gradient(to bottom,
+            transparent 0%,
+            #272727 40%,
+            #272727 5%,
+            transparent 500%);
+
+    -webkit-mask-composite: intersect;
+    mask-composite: intersect;
 }
 
 .person-emoji {
@@ -1469,7 +1476,9 @@ section {
         box-sizing: border-box;
     }
 
-    .project-container::-webkit-scrollbar { display: none; }
+    .project-container::-webkit-scrollbar {
+        display: none;
+    }
 
     .work-row-grid {
         display: contents;
@@ -2096,7 +2105,7 @@ body::before {
         gap: 8px;
         margin-top: 24px;
     }
-    
+
     .testimonials-dots .dot {
         width: 8px;
         height: 8px;
@@ -2105,7 +2114,7 @@ body::before {
         transition: background 0.3s, transform 0.3s;
         cursor: pointer;
     }
-    
+
     .testimonials-dots .dot.active {
         background: var(--orange);
         transform: scale(1.2);
@@ -2232,6 +2241,7 @@ body::before {
     .hero-person {
         width: clamp(550px, 35vw, 950px);
     }
+
     .person-placeholder {
         height: clamp(600px, 95vh, 1400px);
     }
@@ -2241,6 +2251,7 @@ body::before {
     .hero-person {
         width: clamp(750px, 45vw, 1300px);
     }
+
     .person-placeholder {
         height: clamp(750px, 95vh, 1800px);
     }
@@ -2250,6 +2261,7 @@ body::before {
     .hero-person {
         width: clamp(1000px, 50vw, 1800px);
     }
+
     .person-placeholder {
         height: clamp(900px, 95vh, 2400px);
     }
