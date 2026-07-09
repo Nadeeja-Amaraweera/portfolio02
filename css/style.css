@@ -1762,7 +1762,7 @@ section {
     display: none;
     width: 16px;
     height: 16px;
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #fff;
     border-radius: 50%;
     animation: spinLoader 0.6s linear infinite;
@@ -1782,7 +1782,9 @@ section {
 }
 
 @keyframes spinLoader {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ── Toast Notification ── */
@@ -1802,11 +1804,11 @@ section {
     z-index: 9999;
     opacity: 0;
     transform: translateY(20px) scale(0.95);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
     pointer-events: none;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
 .toast.show {
@@ -1956,6 +1958,11 @@ footer {
     text-transform: uppercase;
     color: var(--white);
     margin-bottom: 20px;
+}
+
+.footer-col a {
+    text-decoration: none;
+    color: var(--white);
 }
 
 .footer-links {
@@ -2130,26 +2137,86 @@ body::before {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 32px;
+        gap: 10px;
         position: fixed;
         top: 0;
-        right: -100%;
+        left: 0;
         width: 100vw;
         height: 100vh;
         background: rgba(15, 10, 8, 0.98);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         z-index: 1000;
+        pointer-events: none;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     .nav-links.active {
-        right: 0;
+        pointer-events: auto;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    /* Each li acts as a clip mask so the link "emerges" from below */
+    .nav-links li {
+        overflow: hidden;
+        padding: 4px 0;
+    }
+
+    .nav-links li a {
+        display: block;
+        transform: translateY(110%);
+        transition: transform 0.5s ease,
+            color 0.5s ease;
+    }
+
+    /* When menu is active, links rise up with staggered delays */
+    .nav-links.active li a {
+        transform: translateY(0);
+    }
+
+    .nav-links.active li:nth-child(1) a {
+        transition-delay: 0.08s;
+    }
+
+    .nav-links.active li:nth-child(2) a {
+        transition-delay: 0.15s;
+    }
+
+    .nav-links.active li:nth-child(3) a {
+        transition-delay: 0.22s;
+    }
+
+    .nav-links.active li:nth-child(4) a {
+        transition-delay: 0.29s;
+    }
+
+    .nav-links.active li:nth-child(5) a {
+        transition-delay: 0.36s;
+    }
+
+    /* When menu closes, links drop back instantly (no lingering) */
+    .nav-links:not(.active) li a {
+        transition-delay: 0s;
+        transition-duration: 0.2s;
     }
 
     .nav-links a {
-        font-size: 18px;
-        letter-spacing: 0.12em;
+        font-size: clamp(48px, 12vw, 72px);
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--off-white);
+    }
+
+    .nav-links a:hover {
+        color: var(--orange);
+    }
+
+    .nav-links a::after {
+        display: none;
     }
 
     .nav-burger {
