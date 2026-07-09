@@ -473,6 +473,10 @@ nav.scrolled {
     animation: fadeUp 0.8s 1.1s forwards;
 }
 
+.hero-btns a {
+    text-decoration: none;
+}
+
 .btn-orange {
     background: rgba(211, 84, 0, 0.85);
     color: var(--white);

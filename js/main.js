@@ -1,27 +1,4 @@
-// ── CURSOR ──
-const cursor = document.getElementById('cursor');
-const cursorRing = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-function animateCursor() {
-    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-    cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
-    requestAnimationFrame(animateCursor);
-}
-animateCursor();
-document.querySelectorAll('a, button, .tool-chip, .service-card, .project-card, .testimonial-card').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(2.5)';
-        cursor.style.background = 'rgba(211,84,0,0.6)';
-        cursorRing.style.width = '60px'; cursorRing.style.height = '60px';
-    });
-    el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-        cursor.style.background = 'var(--orange)';
-        cursorRing.style.width = '36px'; cursorRing.style.height = '36px';
-    });
-});
+
 
 // ── NAV SCROLL ──
 const navbar = document.getElementById('navbar');
@@ -169,25 +146,25 @@ if (navBurger && navLinks) {
 function updateHeroImageScale() {
     const img = document.querySelector('.person-placeholder img');
     if (!img) return;
-    
+
     const ratio = window.devicePixelRatio || 1;
     let scale = 1;
-    
+
     // Zoom out (ratio < 1) -> increase scale
     if (ratio < 1) {
         scale = 1 / ratio;
     }
-    
+
     // Also scale up based on viewport width for larger/wider screens
     const width = window.innerWidth;
     if (width > 1200) {
         const widthScale = 1 + (width - 1200) * 0.0003;
         scale *= widthScale;
     }
-    
+
     // Bound the scale factor to reasonable limits
     scale = Math.max(1, Math.min(scale, 2.2));
-    
+
     img.style.setProperty('--img-scale', scale.toFixed(3));
 }
 
@@ -206,7 +183,7 @@ function initTestimonialsCarousel() {
         if (!firstCard) return;
         const cardWidth = firstCard.clientWidth + 16; // width + gap
         const index = Math.round(scrollLeft / cardWidth);
-        
+
         dots.forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
