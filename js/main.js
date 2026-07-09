@@ -31,10 +31,212 @@ const counterObs = new IntersectionObserver(entries => {
 }, { threshold: 0.5 });
 document.querySelectorAll('.counter').forEach(el => counterObs.observe(el));
 
-// ── SERVICE TAGS ──
-document.querySelectorAll('.service-tag').forEach(btn => {
-    btn.addEventListener('click', () => btn.classList.toggle('active'));
+// ── SERVICE TAGS (toggle active for contact form) ──
+document.querySelectorAll('#servicesGroup .service-tag').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        // Clear services error when user selects one
+        const err = document.getElementById('servicesError');
+        const selected = document.querySelectorAll('#servicesGroup .service-tag.active');
+        if (selected.length > 0) {
+            err.textContent = '';
+            err.classList.remove('show');
+        }
+    });
 });
+
+(function () {
+    const WEB3FORMS_ACCESS_KEY = '97b5f21f-ca8d-4940-b760-9c779ed7c48a';
+
+    // DOM refs
+    const form = document.getElementById('contactForm');
+    const nameInput = document.getElementById('contactName');
+    const emailInput = document.getElementById('contactEmail');
+    const subjectInput = document.getElementById('contactSubject');
+    const messageInput = document.getElementById('contactMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    const toast = document.getElementById('formToast');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastMsg = document.getElementById('toastMsg');
+
+    if (!form) return;
+
+    // ── Validation helpers ──
+    function showError(inputEl, errorEl, message) {
+        errorEl.textContent = message;
+        errorEl.classList.add('show');
+        inputEl.classList.add('input-error');
+        inputEl.classList.remove('input-success');
+    }
+
+    function showSuccess(inputEl, errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.remove('show');
+        inputEl.classList.remove('input-error');
+        inputEl.classList.add('input-success');
+    }
+
+    function clearState(inputEl, errorEl) {
+        errorEl.textContent = '';
+        errorEl.classList.remove('show');
+        inputEl.classList.remove('input-error', 'input-success');
+    }
+
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // ── Field validators ──
+    function validateName() {
+        const err = document.getElementById('nameError');
+        const val = nameInput.value.trim();
+        if (!val) { showError(nameInput, err, 'Please enter your name'); return false; }
+        if (val.length < 2) { showError(nameInput, err, 'Name must be at least 2 characters'); return false; }
+        showSuccess(nameInput, err);
+        return true;
+    }
+
+    function validateEmail() {
+        const err = document.getElementById('emailError');
+        const val = emailInput.value.trim();
+        if (!val) { showError(emailInput, err, 'Please enter your email address'); return false; }
+        if (!isValidEmail(val)) { showError(emailInput, err, 'Please enter a valid email address'); return false; }
+        showSuccess(emailInput, err);
+        return true;
+    }
+
+    function validateSubject() {
+        const err = document.getElementById('subjectError');
+        const val = subjectInput.value.trim();
+        if (!val) { showError(subjectInput, err, 'Please enter a subject'); return false; }
+        if (val.length < 3) { showError(subjectInput, err, 'Subject must be at least 3 characters'); return false; }
+        showSuccess(subjectInput, err);
+        return true;
+    }
+
+    function validateMessage() {
+        const err = document.getElementById('messageError');
+        const val = messageInput.value.trim();
+        if (!val) { showError(messageInput, err, 'Please enter your message'); return false; }
+        if (val.length < 10) { showError(messageInput, err, 'Message must be at least 10 characters'); return false; }
+        showSuccess(messageInput, err);
+        return true;
+    }
+
+    function validateServices() {
+        const err = document.getElementById('servicesError');
+        const selected = document.querySelectorAll('#servicesGroup .service-tag.active');
+        if (selected.length === 0) {
+            err.textContent = 'Please select at least one service';
+            err.classList.add('show');
+            return false;
+        }
+        err.textContent = '';
+        err.classList.remove('show');
+        return true;
+    }
+
+    // ── Real-time validation on blur & input ──
+    nameInput.addEventListener('blur', validateName);
+    emailInput.addEventListener('blur', validateEmail);
+    subjectInput.addEventListener('blur', validateSubject);
+    messageInput.addEventListener('blur', validateMessage);
+
+    // Clear error as user types (live feedback)
+    nameInput.addEventListener('input', () => {
+        if (nameInput.classList.contains('input-error')) validateName();
+    });
+    emailInput.addEventListener('input', () => {
+        if (emailInput.classList.contains('input-error')) validateEmail();
+    });
+    subjectInput.addEventListener('input', () => {
+        if (subjectInput.classList.contains('input-error')) validateSubject();
+    });
+    messageInput.addEventListener('input', () => {
+        if (messageInput.classList.contains('input-error')) validateMessage();
+    });
+
+    // ── Toast helper ──
+    function showToast(type, message) {
+        toast.className = 'toast ' + type + ' show';
+        toastIcon.textContent = type === 'success' ? '✓' : '✕';
+        toastMsg.textContent = message;
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 5000);
+    }
+
+    // ── Form submit ──
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // Run all validators
+        const isNameOk = validateName();
+        const isEmailOk = validateEmail();
+        const isSubjectOk = validateSubject();
+        const isMessageOk = validateMessage();
+        const isServicesOk = validateServices();
+
+        if (!isNameOk || !isEmailOk || !isSubjectOk || !isMessageOk || !isServicesOk) {
+            // Scroll to first error
+            const firstError = form.querySelector('.input-error, .field-error.show');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+
+        // Show loading state
+        submitBtn.classList.add('loading');
+
+        // Gather selected services
+        const selectedServices = [];
+        document.querySelectorAll('#servicesGroup .service-tag.active').forEach(tag => {
+            selectedServices.push(tag.dataset.service);
+        });
+
+        // Prepare form data for Web3Forms
+        const formData = new FormData();
+        formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+        formData.append('name', nameInput.value.trim());
+        formData.append('email', emailInput.value.trim());
+        formData.append('subject', subjectInput.value.trim());
+        formData.append('message', messageInput.value.trim());
+        formData.append('services', selectedServices.join(', '));
+        formData.append('from_name', 'Portfolio Contact Form');
+
+        try {
+            // Send email via Web3Forms API
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showToast('success', 'Message sent successfully! I\'ll get back to you soon.');
+
+                // Reset form
+                form.reset();
+                document.querySelectorAll('#servicesGroup .service-tag').forEach(t => t.classList.remove('active'));
+                [nameInput, emailInput, subjectInput, messageInput].forEach(inp => {
+                    inp.classList.remove('input-success', 'input-error');
+                });
+                document.querySelectorAll('.field-error').forEach(e => {
+                    e.textContent = '';
+                    e.classList.remove('show');
+                });
+            } else {
+                throw new Error(result.message || 'Submission failed');
+            }
+        } catch (error) {
+            console.error('Web3Forms Error:', error);
+            showToast('error', 'Failed to send message. Please try again later.');
+        } finally {
+            submitBtn.classList.remove('loading');
+        }
+    });
+})();
 
 // ── NAV SMOOTH SCROLL ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
